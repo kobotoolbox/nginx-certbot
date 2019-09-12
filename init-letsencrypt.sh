@@ -2,6 +2,11 @@
 
 function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}"; }
 
+if ! [ -x "$(command -v docker-compose)" ]; then
+  echo 'Error: docker-compose is not installed.' >&2
+  exit 1
+fi
+
 DOMAINS=(example.com www.example.com)
 DOMAINS_CSV=$(join_by , "${DOMAINS[@]}")
 RSA_KEY_SIZE=4096
@@ -23,7 +28,7 @@ fi
 if [ ! -e "$DATA_PATH/conf/options-ssl-nginx.conf" ] || [ ! -e "$DATA_PATH/conf/ssl-dhparams.pem" ]; then
   echo "### Downloading recommended TLS parameters ..."
   $MKDIR_CMD -p "$DATA_PATH/conf"
-  $CURL_CMD -s https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/options-ssl-nginx.conf > "$DATA_PATH/conf/options-ssl-nginx.conf"
+  $CURL_CMD -s https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/tls_configs/options-ssl-nginx.conf > "$DATA_PATH/conf/options-ssl-nginx.conf"
   $CURL_CMD -s https://raw.githubusercontent.com/certbot/certbot/master/certbot/ssl-dhparams.pem > "$DATA_PATH/conf/ssl-dhparams.pem"
   echo
 fi
